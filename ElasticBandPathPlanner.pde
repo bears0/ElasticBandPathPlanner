@@ -10,6 +10,7 @@ boolean pathReady = false;
 boolean showPreview = false;
 
 ArrayList<Rectangle> rects = new ArrayList<Rectangle>();
+Grid grid = new Grid();
 
 void setup(){
   size(800,800);
@@ -19,20 +20,33 @@ void setup(){
 void draw(){
   background(51);
   
-  for(int i = 0; i < rects.size(); i++){
-    rects.get(i).show();
-  }
-  
   if(showPreview){
     fill(200);
     stroke(0);
     strokeWeight(0);
     rect(rectStart.x, rectStart.y, rectEnd.x, rectEnd.y);
   }
+
+  grid.show();
+
+  for(int i = 0; i < rects.size(); i++){
+    rects.get(i).show();
+  }
   
   drawStartEndPoints();
   if(pathReady){
     path.showBubbles();
+  }
+
+  PVector pvTemp = grid.getClosestObstacle(mouseX/10, mouseY/10); // Coordinates of closest obstacle in pixels
+  PVector pv = new PVector(pvTemp.x, pvTemp.y); // Coordinates of closest obstacle in pixels
+  PVector mv = new PVector(mouseX, mouseY);
+  PVector dist = pvTemp.sub(mv);
+  float d = max(dist.mag()-5,1); // Subtract 5 to get the distance from the edge of the obstacle
+  println(pv.x);
+  if(pv.x > -1){
+    //println(d);
+    ellipse(mouseX, mouseY, d*2, d*2);
   }
 }
 
@@ -72,7 +86,7 @@ void mouseReleased(){
   if(mouseButton == RIGHT){
     rectEnd.x = mouseX-rectStart.x;
     rectEnd.y = mouseY-rectStart.y;
-    rects.add(new Rectangle(rectStart, rectEnd));
+    grid.addRect((int)rectStart.x/10, (int)rectStart.y/10, mouseX/10, mouseY/10);
     rectEnd.x = 0;
     rectEnd.y = 0;
     showPreview = false;
@@ -96,6 +110,6 @@ void drawStartEndPoints(){
 
 void keyPressed(){
   if(key == ' '){
-    rects.clear();
+    grid.clear();
   }
 }

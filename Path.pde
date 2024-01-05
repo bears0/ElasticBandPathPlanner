@@ -22,11 +22,7 @@ class Path {
     PVector p = end.sub(start); // Get the vector from start to end
     startLength = p.mag(); // Get the length of the initial line.
     int count = (int)(startLength / spacing); // number of bubbles
-    println(count);
-    float d = startLength / count; // the spacing between bubbles
-    println(d);
     for(int i = 0; i < (int)count+1; i++){
-      println(run/count);
       Bubble b = new Bubble(new PVector(start.x+(i*(run/count)), start.y+(i*rise/count)), bubbleSize);
       bubbles.add(b);
     }
