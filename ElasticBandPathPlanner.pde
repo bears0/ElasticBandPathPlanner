@@ -11,10 +11,13 @@ boolean showPreview = false;
 
 ArrayList<Rectangle> rects = new ArrayList<Rectangle>();
 Grid grid = new Grid();
+RRT rrt = new RRT(new Coord(40,40), 800);
+
 
 void setup(){
   size(800,800);
   frameRate(60);
+  //rrt.generateTree();
 }
 
 void draw(){
@@ -43,11 +46,12 @@ void draw(){
   PVector mv = new PVector(mouseX, mouseY);
   PVector dist = pvTemp.sub(mv);
   float d = max(dist.mag()-5,1); // Subtract 5 to get the distance from the edge of the obstacle
-  println(pv.x);
+  //println(pv.x);
   if(pv.x > -1){
     //println(d);
     ellipse(mouseX, mouseY, d*2, d*2);
   }
+  rrt.show();
 }
 
 void mousePressed(){
@@ -112,4 +116,11 @@ void keyPressed(){
   if(key == ' '){
     grid.clear();
   }
+  if(key == 'c'){
+    rrt.reset();
+  }
+  if(key == 'g'){
+    rrt.generateTree(grid);
+  }
+  
 }
