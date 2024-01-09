@@ -8,4 +8,6 @@ Use left click to create a start point, click again to make an endpoint, left cl
 
 Use spacebar to clear all obstacles from the grid.
 
-Use 'g' to generate the RRT. 'c' to clear
+Use 'g' to generate the RRT. 'c' to clear.
+
+Use 'l' to load obstacles from a file. Use 's' to save obstacles.
