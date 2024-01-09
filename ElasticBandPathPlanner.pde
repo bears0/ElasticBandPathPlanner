@@ -1,3 +1,6 @@
+import java.io.*;
+import java.io.IOException;
+
 PVector rectStart = new PVector();
 PVector rectEnd = new PVector();
 
@@ -11,7 +14,7 @@ boolean showPreview = false;
 
 ArrayList<Rectangle> rects = new ArrayList<Rectangle>();
 Grid grid = new Grid();
-RRT rrt = new RRT(new Coord(40,40), 800);
+RRT rrt = new RRT(new Coord(5,5), 800);
 
 
 void setup(){
@@ -122,5 +125,39 @@ void keyPressed(){
   if(key == 'g'){
     rrt.generateTree(grid);
   }
+  if(key == 's'){
+    try {
+      println("Attempting To Save Array Contents To File...");
+      BufferedWriter writer = new BufferedWriter(new FileWriter("arrayData.txt", false));
+      for(int i = 0; i < 80; i++) {
+        for(int j = 0; j < 80; j++) {
+          String x = str(grid.grid[i][j]); // Note you have to cast it as strings if not already
+          writer.write(x);
+          writer.newLine();  // More Platform-independent that using write("\n");
+        }
+      }
+      writer.flush();
+      writer.close();
+      println("Saved Array To File Successfully...");
+      } 
+      catch (IOException e) {
+      println("Couldnt Save Array To File... ");
+      e.printStackTrace();
+    }
+  }
   
+  if(key == 'l'){
+    grid.clear();
+    println("Attempting To Load Array Contents To File...");
+    String[] lines = loadStrings("arrayData.txt");
+    if(lines.equals(null)){
+      println("Couldnt Load Array From File... ");
+    } else {
+      println("There are " + lines.length + " lines");
+      for (int i = 0 ; i < lines.length; i++) {
+        grid.grid[i/80][i%80] = parseInt(lines[i]);
+      }
+      println("Loaded Array From File Successfully...");
+    }
+  }
 }
