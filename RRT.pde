@@ -3,7 +3,7 @@ class RRT {
   int numIterations = 10;
   Tree tree = new Tree();
   boolean complete = false;
-  
+  ArrayList<Coord> route = new ArrayList<Coord>();
   ArrayList<Integer> octants = new ArrayList<Integer>();
   int[] octantCount = new int[8];
   
@@ -16,6 +16,19 @@ class RRT {
   
   void show(){
     tree.show();
+    stroke(0,255,0);
+    strokeWeight(3);
+    for(int i = 0; i < route.size()-1; i++){
+      line(route.get(i).x*10+5, route.get(i).y*10+5, route.get(i+1).x*10+5, route.get(i+1).y*10+5);
+    }
+  }
+  
+  void showRoute(){
+    stroke(0,255,0);
+    strokeWeight(3);
+    for(int i = 0; i < route.size()-1; i++){
+      line(route.get(i).x*10+5, route.get(i).y*10+5, route.get(i+1).x*10+5, route.get(i+1).y*10+5);
+    }
   }
   
   void generateTree(Grid g){
@@ -26,11 +39,13 @@ class RRT {
       Coord q_new = newPoint(q_near, q_rand);
       //q_near = nearestVertex(q_new);
       if(!tree.exists(q_new) && g.grid[q_new.x][q_new.y] != 1){
-        tree.addVertice(q_new);
+        tree.addVertice(q_near, q_new);
         tree.addLine(q_near, q_new);
         if(end.dist(q_new) < 2){
           complete = true;
-          println("Route found!");
+          //tree.addVertice(q_new, new Coord(end.x, end.y)); // Add the goal position and it's parent node, q_new.
+          //tree.addLine(q_new, new Coord(end.x, end.y));
+          println("Route found in " + i + " iterations!");
           break;
         }
       } else {
@@ -39,29 +54,34 @@ class RRT {
       }
     }
     int endTime = millis();
-    println(endTime - startTime);
+    println("RRT generated in " + (endTime-startTime) + " ms!");
     for(int i = 0; i < octants.size(); i++){
       octantCount[octants.get(i)]++;
     }
-    println(octantCount);
+    //println(octantCount);
     octantCount = new int[8];
   }
   
-  void createRoute(){
-    ArrayList<Coord> route = new ArrayList<Coord>();
-    ArrayList<Coord> buffer = new ArrayList<Coord>();
-    for(int i = 0; i < tree.verts.size(); i++){
-      tree.countNeighbors(i);
+  void createRoute(Coord goal){
+    route.add(end);
+    backtrack(goal);
+    println("Total number of points in the path: " + route.size());
+  }
+  
+  void backtrack(Coord goal){
+    if(goal.x == tree.getStartX() && goal.y == tree.getStartY()){
+      route.add(goal);
+      return;
     }
-    route.add(start);
-    //for(int i = 0; i < MAX_INT; i++){
-    //  //route.
-    //}
+    route.add(goal);
+    backtrack(goal.parent);
   }
   
   void reset(){
     tree.reset();
     tree.addVertice(start);
+    route.clear();
+    complete = false;
   }
   
   void setStartPoint(Coord start){

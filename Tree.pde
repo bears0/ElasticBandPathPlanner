@@ -1,6 +1,5 @@
 class Tree {
   ArrayList<Coord> verts = new ArrayList<Coord>();
-  ArrayList<Coord> leftover = new ArrayList<Coord>();
   ArrayList<Line> lines = new ArrayList<Line>();
   
   Tree(){
@@ -31,42 +30,26 @@ class Tree {
     return false;
   }
   
-  void countNeighbors(int n){
-    int count = 0;
-    Coord point = new Coord(verts.get(n).x, verts.get(n).y);
-    ArrayList<Coord> neighborCells = new ArrayList<Coord>();
-    neighborCells.add( new Coord(point.x+1, point.y)   );
-    neighborCells.add( new Coord(point.x+1, point.y+1) );
-    neighborCells.add( new Coord(point.x, point.y+1)   );
-    neighborCells.add( new Coord(point.x-1, point.y+1) );
-    neighborCells.add( new Coord(point.x-1, point.y)   );
-    neighborCells.add( new Coord(point.x-1, point.y-1) );
-    neighborCells.add( new Coord(point.x, point.y-1)   );
-    neighborCells.add( new Coord(point.x+1, point.y-1) );
-
-
-    for(int j = 0; j < 8; j++){
-      if( exists( neighborCells.get(j) ) ){
-        count++;
-      }
-    }
-
-    verts.get(n).neighbors = count;
-  }
-  
-  void printNeighborCount(){
-    for(int i = 0; i < verts.size(); i++){
-      println(verts.get(i).neighbors);
-    }
-  }
-  
   void reset(){
     verts.clear();
     lines.clear();
   }
   
-  void addVertice(Coord pos) {
-    verts.add(new Coord(pos.x, pos.y));
+  int getStartX(){
+    return verts.get(0).x;
+  }
+  
+  int getStartY(){
+    return verts.get(0).y;
+  }
+  
+  void addVertice(Coord parent, Coord child) {
+    verts.add(new Coord(child.x, child.y, parent));
+    parent.addChild(child);
+  }
+  
+  void addVertice(Coord parent) {
+    verts.add(new Coord(parent.x, parent.y));
   }
   
   void addLine(Coord start, Coord end){
@@ -76,6 +59,11 @@ class Tree {
   
   Coord getVertice(int i){
     return verts.get(i);
+  }
+  
+  Coord getLastVertice(){
+    //println(verts.size()-1);
+    return verts.get(verts.size()-1);
   }
   
   int getSize(){

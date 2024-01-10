@@ -21,6 +21,7 @@ RRT rrt;
 void setup(){
   size(800,800);
   frameRate(60);
+  loadMap();
   //rrt.generateTree();
 }
 
@@ -53,11 +54,13 @@ void draw(){
   //println(pv.x);
   if(pv.x > -1){
     //println(d);
-    ellipse(mouseX, mouseY, d*2, d*2);
+    //ellipse(mouseX, mouseY, d*2, d*2);
   }
   
   if(pathReady){
-    rrt.show();
+    //rrt.show();
+    path.shrink(grid);
+    //rrt.showRoute();
   }
 }
 
@@ -76,8 +79,8 @@ void mousePressed(){
     } else if (!lastPointPlaced){
       pathEnd = new PVector(mouseX, mouseY);
       lastPointPlaced = true;
-      path = new Path(pathStart, pathEnd, 10, 20); // Create path using start and end points
-      rrt = new RRT(new Coord((int)pathStart.x/10, (int)pathStart.y/10), new Coord((int)pathEnd.x/10, (int)pathEnd.y/10), 100);
+      path = new Path(pathStart, pathEnd, 10, 40); // Create path using start and end points
+      rrt = new RRT(new Coord((int)pathStart.x/10, (int)pathStart.y/10), new Coord((int)pathEnd.x/10, (int)pathEnd.y/10), 3200);
       pathReady = true;
     } else {
       pathStart = new PVector(0,0);
@@ -128,55 +131,62 @@ void keyPressed(){
   if(key == 'c'){
     rrt.reset();
   }
+  if(key == 'm'){
+    path.shrink(grid);
+  }
   if(key == 'g'){
     if(pathReady){
-      int i = 0;
-      while(!rrt.complete && i < 1000){
-        rrt.generateTree(grid);
-        if(rrt.complete){
-          rrt.createRoute();
-        } else {
-          println("Running again" + i);
-          i++;
-        }
+      rrt.generateTree(grid);
+      if(rrt.complete){
+        rrt.createRoute(rrt.tree.getLastVertice());
+        path.generateBubbles(rrt.route);
+      } else {
+        println("RRT not complete in " + rrt.numIterations + " iterations!");
       }
     } else {
       println("Please add start and end points first!");
     }
   }
   if(key == 's'){
-    try {
-      println("Attempting To Save Array Contents To File...");
-      BufferedWriter writer = new BufferedWriter(new FileWriter("arrayData.txt", false));
-      for(int i = 0; i < 80; i++) {
-        for(int j = 0; j < 80; j++) {
-          String x = str(grid.grid[i][j]); // Note you have to cast it as strings if not already
-          writer.write(x);
-          writer.newLine();  // More Platform-independent than using write("\n");
-        }
-      }
-      writer.flush();
-      writer.close();
-      println("Saved Array To File Successfully...");
-      } 
-      catch (IOException e) {
-      println("Couldnt Save Array To File... ");
-      e.printStackTrace();
-    }
+    saveMap();
   }
   
   if(key == 'l'){
-    grid.clear();
-    println("Attempting To Load Array Contents To File...");
-    String[] lines = loadStrings("arrayData.txt");
-    if(lines.equals(null)){
-      println("Couldnt Load Array From File... ");
-    } else {
-      println("There are " + lines.length + " lines");
-      for (int i = 0 ; i < lines.length; i++) {
-        grid.grid[i/80][i%80] = parseInt(lines[i]);
-      }
-      println("Loaded Array From File Successfully...");
+    loadMap();
+  }
+}
+
+void loadMap(){
+  grid.clear();
+  println("Attempting To Load Array Contents To File...");
+  String[] lines = loadStrings("arrayData.txt");
+  if(lines.equals(null)){
+    println("Couldnt Load Array From File... ");
+  } else {
+    println("There are " + lines.length + " lines");
+    for (int i = 0 ; i < lines.length; i++) {
+      grid.grid[i/80][i%80] = parseInt(lines[i]);
     }
+    println("Loaded Array From File Successfully...");
+  }
+}
+
+void saveMap(){
+  try {
+    println("Attempting To Save Array Contents To File...");
+    BufferedWriter writer = new BufferedWriter(new FileWriter("arrayData.txt", false));
+    for(int i = 0; i < 80; i++) {
+      for(int j = 0; j < 80; j++) {
+        String x = str(grid.grid[i][j]); // Note you have to cast it as strings if not already
+        writer.write(x);
+        writer.newLine();  // More Platform-independent than using write("\n");
+      }
+    }
+    writer.flush();
+    writer.close();
+    println("Saved Array To File Successfully...");
+  } catch (IOException e) {
+    println("Couldnt Save Array To File... ");
+    e.printStackTrace();
   }
 }

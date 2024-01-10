@@ -32,7 +32,7 @@ class Grid {
             }
         }
         //println(closest);
-        return closest; // Returns two 
+        return closest; // Returns pixel position of closest obstacle
     }
 
     void show() {
