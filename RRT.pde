@@ -1,13 +1,15 @@
 class RRT {
-  Coord start = new Coord(0,0);
+  Coord start, end = new Coord(0,0);
   int numIterations = 10;
   Tree tree = new Tree();
+  boolean complete = false;
   
   ArrayList<Integer> octants = new ArrayList<Integer>();
   int[] octantCount = new int[8];
   
-  RRT(Coord startPoint, int k){
+  RRT(Coord startPoint, Coord endPoint, int k){
     this.start = startPoint;
+    this.end = endPoint;
     this.numIterations = k;
     tree.addVertice(start);
   }
@@ -26,9 +28,14 @@ class RRT {
       if(!tree.exists(q_new) && g.grid[q_new.x][q_new.y] != 1){
         tree.addVertice(q_new);
         tree.addLine(q_near, q_new);
+        if(end.dist(q_new) < 2){
+          complete = true;
+          println("Route found!");
+          break;
+        }
       } else {
         i-=1;
-        println("Space occupied");
+        //println("Space occupied");
       }
     }
     int endTime = millis();
@@ -40,9 +47,29 @@ class RRT {
     octantCount = new int[8];
   }
   
+  void createRoute(){
+    ArrayList<Coord> route = new ArrayList<Coord>();
+    ArrayList<Coord> buffer = new ArrayList<Coord>();
+    for(int i = 0; i < tree.verts.size(); i++){
+      tree.countNeighbors(i);
+    }
+    route.add(start);
+    //for(int i = 0; i < MAX_INT; i++){
+    //  //route.
+    //}
+  }
+  
   void reset(){
     tree.reset();
     tree.addVertice(start);
+  }
+  
+  void setStartPoint(Coord start){
+    this.start = start;
+  }
+  
+  void setEndPoint(Coord end){
+    this.end = end;
   }
   
   Coord nearestVertex(Coord q_rand){

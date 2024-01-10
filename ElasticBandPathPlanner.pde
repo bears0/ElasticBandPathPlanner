@@ -11,10 +11,11 @@ boolean lastPointPlaced = false;
 Path path;
 boolean pathReady = false;
 boolean showPreview = false;
+boolean rrtReady = false;
 
 ArrayList<Rectangle> rects = new ArrayList<Rectangle>();
 Grid grid = new Grid();
-RRT rrt = new RRT(new Coord(5,5), 800);
+RRT rrt;
 
 
 void setup(){
@@ -54,7 +55,10 @@ void draw(){
     //println(d);
     ellipse(mouseX, mouseY, d*2, d*2);
   }
-  rrt.show();
+  
+  if(pathReady){
+    rrt.show();
+  }
 }
 
 void mousePressed(){
@@ -72,11 +76,13 @@ void mousePressed(){
     } else if (!lastPointPlaced){
       pathEnd = new PVector(mouseX, mouseY);
       lastPointPlaced = true;
-      path = new Path(pathStart, pathEnd, 10, 20);
+      path = new Path(pathStart, pathEnd, 10, 20); // Create path using start and end points
+      rrt = new RRT(new Coord((int)pathStart.x/10, (int)pathStart.y/10), new Coord((int)pathEnd.x/10, (int)pathEnd.y/10), 100);
       pathReady = true;
     } else {
       pathStart = new PVector(0,0);
       pathEnd = new PVector(0,0);
+      rrt.reset();
       firstPointPlaced = false;
       lastPointPlaced = false;
       pathReady = false;
@@ -123,7 +129,20 @@ void keyPressed(){
     rrt.reset();
   }
   if(key == 'g'){
-    rrt.generateTree(grid);
+    if(pathReady){
+      int i = 0;
+      while(!rrt.complete && i < 1000){
+        rrt.generateTree(grid);
+        if(rrt.complete){
+          rrt.createRoute();
+        } else {
+          println("Running again" + i);
+          i++;
+        }
+      }
+    } else {
+      println("Please add start and end points first!");
+    }
   }
   if(key == 's'){
     try {
@@ -133,7 +152,7 @@ void keyPressed(){
         for(int j = 0; j < 80; j++) {
           String x = str(grid.grid[i][j]); // Note you have to cast it as strings if not already
           writer.write(x);
-          writer.newLine();  // More Platform-independent that using write("\n");
+          writer.newLine();  // More Platform-independent than using write("\n");
         }
       }
       writer.flush();

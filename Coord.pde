@@ -1,5 +1,6 @@
 class Coord {
   int x, y;
+  int neighbors = 0;
   
   Coord(int _x, int _y){
     this.x = _x;
