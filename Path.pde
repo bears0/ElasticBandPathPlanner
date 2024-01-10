@@ -24,9 +24,9 @@ class Path {
   }
   
   void shrink(Grid grid){
-    float kt = 0.1; // Tension force factor
-    float kr = 0.07;
-    int steps = 5;
+    float kt = 0.08; // Tension force factor
+    float kr = 0.04;
+    int steps = 10;
     for(int step = 0; step < steps; step++){
       // Remove or add bubbles
       for(int i = 1; i < bubbles.size()-1; i++){
@@ -35,9 +35,9 @@ class Path {
         PVector bp1 = bubbles.get(i+1).pos.copy();
         float d1 = b.copy().sub(bm1).mag();
         float d2 = b.copy().sub(bp1).mag();
-        print(d1);
-        print(", ");
-        println(d2);
+        //print(d1);
+        //print(", ");
+        //println(d2);
         if(d1+d2 < 25){
           bubbles.remove(i);
         }
